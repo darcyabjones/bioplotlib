@@ -13,12 +13,14 @@ Features
 
 bioplotlib aims to provide ways of plotting:
 
-- [ ] gene structures
-- [ ] ideograms
-- [ ] circos style plots
-- [ ] phylogenies
-- [ ] cladograms
-- [ ] multiple sequence alignments
+.. ☑
+
+- ☐ gene structures
+- ☐ ideograms
+- ☐ circos style plots
+- ☐ phylogenies
+- ☐ cladograms
+- ☐ multiple sequence alignments
 
 
 Dependencies

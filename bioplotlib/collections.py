@@ -36,3 +36,27 @@ from matplotlib.collections import Collection
 from matplotlib.collections import PathCollection
 from matplotlib.collections import PolyCollection
 
+
+class Track(Collection):
+
+	""" Generic collection for genomic tracks.
+
+	Methods
+	-------
+	stack
+		Determines how to stack features in a track
+	"""
+
+	def __init__(self):
+		""" . """
+		return
+
+
+class Feature(Collection):
+
+	""" Groups shapes into features so that they stay together
+	in stacked tracks. """
+
+	def __init__(self):
+		""" . """
+		return

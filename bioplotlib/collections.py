@@ -14,7 +14,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import six
-from six.moves import zip
+#from six.moves import zip
 import warnings
 import numpy as np
 import numpy.ma as ma
@@ -39,24 +39,42 @@ from matplotlib.collections import PolyCollection
 
 class Track(Collection):
 
-	""" Generic collection for genomic tracks.
+    """ Generic collection for genomic tracks.
 
-	Methods
-	-------
-	stack
-		Determines how to stack features in a track
-	"""
+    Methods
+    -------
+    stack
+        Determines how to stack features in a track
+    """
 
-	def __init__(self):
-		""" . """
-		return
+    def __init__(self):
+        """ . """
+        return
 
 
 class Feature(Collection):
 
-	""" Groups shapes into features so that they stay together
-	in stacked tracks. """
+    """ Groups shapes into features so that they stay together
+    in stacked tracks. """
 
-	def __init__(self):
-		""" . """
-		return
+    def __init__(self):
+        """ . """
+        return
+
+
+class Sequence(Collection):
+
+    """ . """
+
+    def __init__(self):
+        """ . """
+        return
+
+
+class Alignment(Collection):
+
+    """ . """
+
+    def __init__(self):
+        """ . """
+        return

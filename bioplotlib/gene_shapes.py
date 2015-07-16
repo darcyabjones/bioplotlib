@@ -13,22 +13,23 @@ class Shape(object):
             angle=0,
             x_offset=0,
             y_offset=0,
+            width=1,
             ):
         """ . """
         self.angle = angle
         self.x_offset = x_offset
         self.y_offset = y_offset
+        self.width = width
         return
 
     def __call__(
             self,
             x,
             y,
-            length,
-            width
+            length
             ):
         """ . """
-        return
+        return self._draw(x, y, length)
 
     def _rotate(self):
         """ . """
@@ -43,12 +44,11 @@ class Rectangle(Shape):
             self,
             x,
             y,
-            length,
-            width
+            length
             ):
         """ . """
-        x += self.x_offset * length
-        y += self.y_offset * width
+        x += self.x_offset
+        y += self.y_offset
 
         codes = np.array([
             Path.MOVETO,
@@ -61,8 +61,8 @@ class Rectangle(Shape):
         path = np.array([
             [x, y],  # bottom left
             [x + length, y],  # bottom right
-            [x + length, y + width],  # top right
-            [x, y + width],  # top left
+            [x + length, y + self.width],  # top right
+            [x, y + self.width],  # top left
             [x, y]  # bottom left
             ])
         return path, codes
@@ -74,36 +74,53 @@ class Arrow(Shape):
 
     def __init__(
             self,
-            angle=0,
-            x_offset=0,
-            y_offset=0,
-            tail_width=0.8
+            tail_width=0.8,
+            tip_angle=90,
+            **kwargs
             ):
         """ . """
-        self.angle = angle
-        self.x_offset = x_offset
-        self.y_offset = y_offset
+        super().__init__(**kwargs)
         self.tail_width = tail_width
+        self.tip_angle = tip_angle
+
+        
         return
 
     def _draw(
             self,
             x,
             y,
-            length,
-            width
+            length
             ):
+        """ . """
+        x += self.x_offset
+        y += self.y_offset
 
-        x += self.x_offset * length
-        y += self.y_offset * width
+        tail_offset = (self.width - (self.width * self.tail_width)) / 2
 
-        tail_offset = (width - self.tail_width) / 2
+        codes = np.array([
+            Path.MOVETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.CLOSEPOLY
+            ])
 
         path = np.array([
             [x, y + tail_offset],
-            []
+            [x, y + self.width - tail_offset],
+            [x + length - self.width, y + self.width - tail_offset],
+            [x + length - self.width, y + self.width],
+            [x + length, y + (self.width / 2)],
+            [x + length - self.width, y],
+            [x + length - self.width, y + tail_offset],
+            [x, y + tail_offset]
             ])
-        return
+
+        return path, codes
 
 
 class Hexagon(Shape):
@@ -142,16 +159,60 @@ class OpenTriangle(Shape):
 
     """ . """
 
-    def __init__(self):
-        return
+    def _draw(
+            self,
+            x,
+            y,
+            length
+            ):
+        """ . """
+        x += self.x_offset
+        y += self.y_offset
+
+        codes = np.array([
+            Path.MOVETO,
+            Path.LINETO,
+            Path.LINETO
+            ])
+
+        path = np.array([
+            [x, y],
+            [x + length / 2, y + self.width],
+            [x + length, y]
+            ])
+
+        return path, codes
 
 
 class OpenRectangle(Shape):
 
     """ . """
 
-    def __init__(self):
-        return
+    def _draw(
+            self,
+            x,
+            y,
+            length
+            ):
+        """ . """
+        x += self.x_offset
+        y += self.y_offset
+
+        codes = np.array([
+            Path.MOVETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.CLOSEPOLY
+            ])
+
+        path = np.array([
+            [x, y],
+            [x, y + self.width],
+            [x + length, y],
+            [x, y]
+            ])
+
+        return path, codes
 
 
 class SineWave(Shape):

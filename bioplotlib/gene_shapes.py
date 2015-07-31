@@ -2,6 +2,8 @@
 
 from matplotlib.path import Path
 import numpy as np
+from math import sin
+from math import radians
 
 
 class Shape(object):
@@ -82,8 +84,7 @@ class Arrow(Shape):
         super().__init__(**kwargs)
         self.tail_width = tail_width
         self.tip_angle = tip_angle
-
-        
+        self.head_length = (sin(radians(90 - (self.tip_angle/2))) * self.width/2) / sin(radians(self.tip_angle/2))
         return
 
     def _draw(
@@ -108,15 +109,15 @@ class Arrow(Shape):
             Path.LINETO,
             Path.CLOSEPOLY
             ])
-
+        # TODO: add conditional formatting for case head_length > length
         path = np.array([
             [x, y + tail_offset],
             [x, y + self.width - tail_offset],
-            [x + length - self.width, y + self.width - tail_offset],
-            [x + length - self.width, y + self.width],
+            [x + length - self.head_length, y + self.width - tail_offset],
+            [x + length - self.head_length, y + self.width],
             [x + length, y + (self.width / 2)],
-            [x + length - self.width, y],
-            [x + length - self.width, y + tail_offset],
+            [x + length - self.head_length, y],
+            [x + length - self.head_length, y + tail_offset],
             [x, y + tail_offset]
             ])
 

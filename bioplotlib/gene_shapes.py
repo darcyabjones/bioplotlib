@@ -16,12 +16,14 @@ class Shape(object):
             x_offset=0,
             y_offset=0,
             width=1,
+            **kwargs
             ):
         """ . """
         self.angle = angle
         self.x_offset = x_offset
         self.y_offset = y_offset
         self.width = width
+        self.properties = kwargs
         return
 
     def __call__(
@@ -144,8 +146,38 @@ class Triangle(Shape):
 
     """ Triangle. """
 
-    def __init__(self):
+    def __init__(
+            self,
+            **kwargs
+            ):
+        """ . """
+        super().__init__(**kwargs)
         return
+
+    def _draw(
+            self,
+            x,
+            y,
+            length
+            ):
+        """ . """
+        x += self.x_offset
+        y += self.y_offset
+
+        codes = np.array([
+            Path.MOVETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.CLOSEPOLY
+            ])
+        # TODO: add conditional formatting for case head_length > length
+        path = np.array([
+            [x, y],
+            [x, y + self.width],
+            [x + length, y + (self.width / 2)],
+            [x, y]
+            ])
+        return path, codes
 
 
 class Trapeziod(Shape):

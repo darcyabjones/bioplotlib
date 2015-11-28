@@ -4,6 +4,7 @@ from matplotlib.path import Path
 import numpy as np
 from math import sin
 from math import radians
+from matplotlib.patches import PathPatch
 
 
 class Shape(object):
@@ -12,47 +13,42 @@ class Shape(object):
 
     def __init__(
             self,
-            angle=0,
+            x,
+            y,
             x_offset=0,
             y_offset=0,
             width=1,
+            by=None,
             **kwargs
             ):
         """ . """
-        self.angle = angle
+        self.x = x
+        self.y = y
         self.x_offset = x_offset
         self.y_offset = y_offset
         self.width = width
         self.properties = kwargs
+        self.by = by
         return
 
-    def __call__(
-            self,
-            x,
-            y,
-            length
-            ):
+    def __call__(self):
         """ . """
-        return self._draw(x, y, length)
-
-    def _rotate(self):
-        """ . """
-        return
+        return self.draw()
 
 
 class Rectangle(Shape):
 
     """ Rectangle. """
 
-    def _draw(
-            self,
-            x,
-            y,
-            length
-            ):
+    def draw(self):
         """ . """
-        x += self.x_offset
-        y += self.y_offset
+        x1, x2 = self.x
+        y1, y2 = self.y
+
+        x1 += self.x_offset
+        x2 += self.x_offset
+        y1 += self.y_offset
+        y2 += self.y_offset
 
         codes = np.array([
             Path.MOVETO,
@@ -63,15 +59,124 @@ class Rectangle(Shape):
             ])
 
         path = np.array([
-            [x, y],  # bottom left
-            [x + length, y],  # bottom right
-            [x + length, y + self.width],  # top right
-            [x, y + self.width],  # top left
-            [x, y]  # bottom left
+            [x1, y1],  # bottom left
+            [x2, y2],  # bottom right
+            [x2, y2 + self.width],  # top right
+            [x1, y1 + self.width],  # top left
+            [x1, y1]  # bottom left
             ])
-        return path, codes
+
+        if self.by == 'y':
+            path[2] = [x2 + self.width, y2]
+            path[3] = [x1 + self.width, y1]
+
+        return PathPatch(Path(path, codes), **self.properties)
 
 
+class Triangle(Shape):
+
+    """ Triangle. """
+
+    def draw(self):
+        """ . """
+        x1, x2 = self.x
+        y1, y2 = self.y
+        x1 += self.x_offset
+        x2 += self.x_offset
+        y1 += self.y_offset
+        y2 += self.y_offset
+        xm = (x1 + x2) / 2
+        ym = (y1 + y2)/2
+
+        codes = np.array([
+            Path.MOVETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.CLOSEPOLY
+            ])
+
+        path = np.array([
+            [x1, y1],
+            [x1, y2 + self.width],
+            [x2, ym + (self.width / 2)],
+            [x1, y1]
+            ])
+        if self.by == 'y':
+            path[1] = [x1 + (self.width / 2), y2]
+            path[2] = [x2 + self.width, y1]
+
+        return PathPatch(Path(path, codes), **self.properties)
+
+
+class OpenTriangle(Shape):
+
+    """ . """
+
+    def draw(self):
+        """ . """
+        x1, x2 = self.x
+        y1, y2 = self.y
+
+        x1 += self.x_offset
+        x2 += self.x_offset
+        y1 += self.y_offset
+        y2 += self.y_offset
+        xm = (x1 + x2) / 2
+        ym = (y1 + y2)/2
+
+        codes = np.array([
+            Path.MOVETO,
+            Path.LINETO,
+            Path.LINETO,
+            ])
+        path = np.array([
+            [x1, y1],
+            [xm, ym + self.width],
+            [x2, y1],
+            ])
+        if self.by == 'y':
+            path[1] = [xm + (self.width / 2), ym]
+            path[2] = [x2 + self.width, y2]
+
+        return PathPatch(Path(path, codes), **self.properties)
+
+
+class OpenRectangle(Shape):
+
+    """ . """
+
+    def draw(self):
+        """ . """
+        x1, x2 = self.x
+        y1, y2 = self.y
+
+        x1 += self.x_offset
+        x2 += self.x_offset
+        y1 += self.y_offset
+        y2 += self.y_offset
+
+        codes = np.array([
+            Path.MOVETO,
+            Path.LINETO,
+            Path.LINETO,
+            Path.LINETO
+            ])
+
+        path = np.array([
+            [x1, y1],  # bottom left
+            [x2, y2],  # bottom right
+            [x2, y2 + self.width],  # top right
+            [x1, y1 + self.width],  # top left
+            ])
+
+        if self.by == 'y':
+            path[2] = [x2 + self.width, y2]
+            path[3] = [x1 + self.width, y1]
+
+        return PathPatch(Path(path, codes), **self.properties)
+
+
+'''
 class Arrow(Shape):
 
     """ Arrow. """
@@ -142,110 +247,12 @@ class Ellipse(Shape):
         return
 
 
-class Triangle(Shape):
-
-    """ Triangle. """
-
-    def __init__(
-            self,
-            **kwargs
-            ):
-        """ . """
-        super().__init__(**kwargs)
-        return
-
-    def _draw(
-            self,
-            x,
-            y,
-            length
-            ):
-        """ . """
-        x += self.x_offset
-        y += self.y_offset
-
-        codes = np.array([
-            Path.MOVETO,
-            Path.LINETO,
-            Path.LINETO,
-            Path.CLOSEPOLY
-            ])
-        # TODO: add conditional formatting for case head_length > length
-        path = np.array([
-            [x, y],
-            [x, y + self.width],
-            [x + length, y + (self.width / 2)],
-            [x, y]
-            ])
-        return path, codes
-
-
 class Trapeziod(Shape):
 
     """ Trapeziod. """
 
     def __init__(self):
         return
-
-
-class OpenTriangle(Shape):
-
-    """ . """
-
-    def _draw(
-            self,
-            x,
-            y,
-            length
-            ):
-        """ . """
-        x += self.x_offset
-        y += self.y_offset
-
-        codes = np.array([
-            Path.MOVETO,
-            Path.LINETO,
-            Path.LINETO
-            ])
-
-        path = np.array([
-            [x, y],
-            [x + length / 2, y + self.width],
-            [x + length, y]
-            ])
-
-        return path, codes
-
-
-class OpenRectangle(Shape):
-
-    """ . """
-
-    def _draw(
-            self,
-            x,
-            y,
-            length
-            ):
-        """ . """
-        x += self.x_offset
-        y += self.y_offset
-
-        codes = np.array([
-            Path.MOVETO,
-            Path.LINETO,
-            Path.LINETO,
-            Path.CLOSEPOLY
-            ])
-
-        path = np.array([
-            [x, y],
-            [x, y + self.width],
-            [x + length, y],
-            [x, y]
-            ])
-
-        return path, codes
 
 
 class SineWave(Shape):
@@ -294,3 +301,4 @@ class DoubleHelix(Shape):
 
     def __init__(self):
         return
+'''

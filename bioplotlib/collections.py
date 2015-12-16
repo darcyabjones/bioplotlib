@@ -15,15 +15,13 @@ from __future__ import (absolute_import, division, print_function,
 
 from copy import copy
 
-from gene_shapes import Rectangle
-from gene_shapes import OpenTriangle
-from utils import read_promer_coords
-from utils import in_handler
-
 import numpy as np
 import matplotlib.transforms as transforms
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
+
+from gene_shapes import Rectangle
+from gene_shapes import OpenTriangle
 
 def new_shape(c, **kwargs):
     """ . """
@@ -305,36 +303,6 @@ class LinkCollection(object):
             self.links.append(lobj)
             new_links.append(lobj)
 
-        return new_links
-
-    def add_coords(self, fp, r, q, by=None, thres=85):
-        """ . """
-        by = self.by if by is None else by
-        obj = self.obj
-
-        new_links = list()
-        with in_handler(fp) as handle:
-            for link in read_promer_coords(handle):
-                if link['pid'] < thres:
-                    continue
-                lobj = obj()
-                reference = link[r]
-                query = link[q]
-                raxis = lobj.ax1
-                qaxis = lobj.ax2
-                lobj.properties['alpha'] = link["pid"]/1000
-
-                if by == 'y':
-                    lobj.ax1_yrange = reference['start'], reference['end']
-                    lobj.ax2_yrange = query['start'], query['end']
-                    if lobj.by is None:
-                        lobj.by = by
-                else:
-                    lobj.ax1_xrange = reference['start'], reference['end']
-                    lobj.ax2_xrange = query['start'], query['end']
-
-                new_links.append(lobj)
-                self.links.append(lobj)
         return new_links
 
     def __call__(self):

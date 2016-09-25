@@ -1,5 +1,5 @@
-from gene_shapes import Triangle
-from gene_shapes import OpenTriangle
+from feature_shapes import Triangle
+from feature_shapes import OpenTriangle
 
 import matplotlib.patches as patches
 from matplotlib.path import Path
@@ -11,7 +11,7 @@ def draw_region(
         end=None,
         intron_threshold=1,
         exon=Triangle(width=1),
-        intron=OpenTriangle(width=0.5, y_offset=0.5),
+        intron=OpenTriangle(width=0.5, offset=0.5),
         other_shapes=dict(),
         names_to_print=dict(),
         ):
@@ -126,7 +126,7 @@ def draw_region(
         end=None,
         intron_threshold=1,
         exon=Triangle(width=1),
-        intron=OpenTriangle(width=0.5, y_offset=0.5),
+        intron=OpenTriangle(width=0.5, offset=0.5),
         other_shapes=dict(),
         names_to_print=dict(),
         ):
@@ -427,6 +427,3 @@ def draw_synteny(
                                 x2_length=link[qscaffold]['length'],
                                 alpha=link["psim"]/1000
                                 )
-fig.savefig('combined-zoom.svg')
-fig.savefig('combined-zoom.png', dpi=600)
-fig.show()

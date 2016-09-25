@@ -10,6 +10,8 @@ they are meant to be fast for common use cases (e.g., a large set of solid
 line segemnts)
 """
 
+############################ Import all modules ##############################
+
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
@@ -20,8 +22,14 @@ import matplotlib.transforms as transforms
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 
-from gene_shapes import Rectangle
-from gene_shapes import OpenTriangle
+from feature_shapes import Triangle
+from feature_shapes import OpenTriangle
+
+
+__contributors = [
+    "Darcy Jones <darcy.ab.jones@gmail.com>"
+    ]
+
 
 def new_shape(c, **kwargs):
     """ . """
@@ -31,6 +39,7 @@ def new_shape(c, **kwargs):
         return c(*p, **d)
     return callable
 
+################################## Classes ###################################
 
 class Feature(object):
 
@@ -39,24 +48,19 @@ class Feature(object):
 
     def __init__(
             self,
-            blocks=list(),
-            shape=new_shape(Rectangle, width=1, y_offset=-0.5),
-            between_shape=new_shape(OpenTriangle, width=0.5, facecolor='none'),
-            first_shape=None,
-            last_shape=None,
+            shapes=new_shape(Triangle, width=1, offset=-0.5),
+            blocks=[],
             by=None,
             name=None,
             ):
         """ . """
-        self.blocks = list()
-        self.shape = shape
-        self.between_shape = between_shape
-        self.first_shape = first_shape
-        self.last_shape = last_shape
+        self.blocks = dict()
+        self.shapes = dict()
         self.by = by
         self.name = name
-        self.add(blocks)
         return
+
+
 
     def add(self, blocks):
         """ . """
@@ -328,3 +332,7 @@ class LinkCollection(object):
         if self.add_to_fig:
             self.figure.patches.extend(patches)
         return patches
+
+
+
+################################# Functions ##################################

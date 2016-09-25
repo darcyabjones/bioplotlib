@@ -10,7 +10,7 @@ Many plotting libraries do some things well, but often over-simplify the process
 
 Bioplotlib provides shapes and convenient methods to plot: genomic features, alignments, cladograms and phylogenies, ideograms, and linkage maps.
 It is designed to drop in seamlessly with `matplotlib <http://matplotlib.org/>`_ so that you still have access to native plotting geometries (eg. histograms and scatterplots).
-Furthermore, being written in python means that you get access to all of the computational goodies that `jupyter http://jupyter.org/`_, `scipy <http://www.scipy.org/>`_, `numpy <http://www.numpy.org/>`_, `pandas <http://pandas.pydata.org/>`_, and `biopython <http://biopython.org/wiki/Main_Page>`_ packages have to offer.
+Furthermore, being written in python means that you get access to all of the computational goodies that `jupyter <http://jupyter.org/>`_, `scipy <http://www.scipy.org/>`_, `numpy <http://www.numpy.org/>`_, `pandas <http://pandas.pydata.org/>`_, and `biopython <http://biopython.org/wiki/Main_Page>`_ packages have to offer.
 
 
 Features
@@ -19,6 +19,7 @@ Features
 bioplotlib aims to provide ways of plotting:
 
 .. ☑
+.. ☐
 
 - ☑ gene structures
 - ☐ ideograms

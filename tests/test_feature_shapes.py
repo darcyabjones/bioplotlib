@@ -13,8 +13,7 @@ from matplotlib.patches import PathPatch
 class TestRectangle(unittest.TestCase):
 
     def test_simple(self):
-        obj = Rectangle(offset=1, width=1, by="x")
-        path = obj.path(start=1, end=3)
+        obj = Rectangle(start=1, end=3, offset=1, width=1, by="x")
 
         expected_verts = [
             [1., 1.],
@@ -32,8 +31,8 @@ class TestRectangle(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_by_y(self):
         obj = Rectangle(offset=1, width=1, by="y")

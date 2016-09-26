@@ -24,6 +24,7 @@ from matplotlib.patches import PathPatch
 
 from matplotlib.collections import PathCollection
 
+import feature_shapes
 from feature_shapes import Triangle
 from feature_shapes import OpenTriangle
 
@@ -32,14 +33,6 @@ __contributors = [
     "Darcy Jones <darcy.ab.jones@gmail.com>"
     ]
 
-def new_shape(c, **kwargs):
-    """ . """
-    def callable(*p, **k):
-        d = kwargs
-        d.update(k)
-        return c(*p, **d)
-    return callable
-
 ################################## Classes ###################################
 
 class Feature(object):
@@ -47,34 +40,42 @@ class Feature(object):
     """ Groups shapes into features so that they stay together
     in stacked tracks. """
 
+    valid_kwargs = [
+        "edgecolors",
+        "facecolors",
+        "linewidths",
+        "antialiaseds",
+        "offsets",
+        "transOffset",
+        "offset_position",
+        "norm",
+        "cmap",
+        "hatch",
+        "zorder"
+        ]
+
     def __init__(
             self,
-            shapes=new_shape(Triangle, width=1, offset=-0.5),
-            stacking=[None ],
-            blocks=[],
+            offset=0,
             by=None,
             name=None,
+            **kwargs
             ):
         """ . """
-        if isinstance(shapes, dict):
-            self.shapes = shapes
-        else:
-            self.shapes = {"base": shapes}
 
-        for name, shape in self.shapes.items():
-            if isinstance(shape, feature_shapes.Shape):
-                shape = [shape]
+        self.shapes = kwargs
+        for shape, obj in self.shapes.items():
+            if isinstance(obj, feature_shapes.Shape):
+                obj = [obj]
 
-        if isinstance(blocks, dict):
-            self.blocks = blocks
-        else:
-            self.blocks = {"base": blocks}
+            if not (0 < len(obj) <= 3):
+                raise ValueError((
+                        "The shape {} has an invalid number of elements."
+                        "Each shape must have 1, 2, or 3 elements."
+                        ).format(shape)
+                    )
 
-        for name, block in self.blocks.items():
-            block = np.array(block)
-            if len(block.shape) == 1:
-                block = np.array([block])
-
+        self.offset = offset
         self.by = by
         self.name = name
         return
@@ -83,36 +84,49 @@ class Feature(object):
         """ . """
         return self.draw()
 
+    def __extend_dict(self, old_dict, new_dict):
+        """ . """
+        length = 0
+        for k, v in old_dict.items():
+            if len(v) > length:
+                length = len(v)
+
+        for key, val in new_dict:
+            if key not in old_dict:
+                old_dict[key] = [None] * length
+
+            old_dict[key].extend(list(val))
+
+        return old_dict
+
     def draw(self):
         """ . """
-        for block_type, block_list in self.blocks.items():
-            collections = list()
-            block_shapes = self.shapes[block_type]
 
-            start = 0
-            end = None
+        paths = list()
+        properties = dict()
 
-            if len(block_shapes) == 3:
-                collections.append(
-                    PathCollection(block_shapes[0](*block_list[0]))
-                    )
-                start = 1
+        start = 0
+        end = None
 
-            if len(block_shapes) in (2, 3):
-                end = -1
+        paths.extend([self.shapes[start].path(*p) for
+                      p in self.blocks])
 
-            collections.append(
-                PathCollection(
-                    [block_shapes[start](*p) for p in block_list[start:end]]
-                    )
+        shape_pos = 0
+        length_blocks = len(self.blocks)
+        for i, block in enumerate(self.blocks):
+            if len(self.shapes) > 1 and i + 1 == length_blocks:
+                shape_pos = -1
+
+            paths.append(self.shapes[shape_pos].path(*block))
+            properties = self.__extend_dict(
+                properties,
+                self.shapes[shape_pos].properties
                 )
 
-            if len(block_shapes) in (2, 3):
-                collections.append(
-                    PathCollection(block_shapes[-1](*block_list[-1]))
-                    )
+            if len(self.shapes) > 1:
+                shape_pos = 1
 
-        return
+        return paths, properties
 
 
 class FeatureTrack(object):

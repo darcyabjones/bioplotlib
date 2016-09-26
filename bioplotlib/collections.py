@@ -22,6 +22,8 @@ import matplotlib.transforms as transforms
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 
+from matplotlib.collections import PathCollection
+
 from feature_shapes import Triangle
 from feature_shapes import OpenTriangle
 
@@ -29,7 +31,6 @@ from feature_shapes import OpenTriangle
 __contributors = [
     "Darcy Jones <darcy.ab.jones@gmail.com>"
     ]
-
 
 def new_shape(c, **kwargs):
     """ . """
@@ -49,46 +50,33 @@ class Feature(object):
     def __init__(
             self,
             shapes=new_shape(Triangle, width=1, offset=-0.5),
+            stacking=[None ],
             blocks=[],
             by=None,
             name=None,
             ):
         """ . """
-        self.blocks = dict()
-        self.shapes = dict()
+        if isinstance(shapes, dict):
+            self.shapes = shapes
+        else:
+            self.shapes = {"base": shapes}
+
+        for name, shape in self.shapes.items():
+            if isinstance(shape, feature_shapes.Shape):
+                shape = [shape]
+
+        if isinstance(blocks, dict):
+            self.blocks = blocks
+        else:
+            self.blocks = {"base": blocks}
+
+        for name, block in self.blocks.items():
+            block = np.array(block)
+            if len(block.shape) == 1:
+                block = np.array([block])
+
         self.by = by
         self.name = name
-        return
-
-
-
-    def add(self, blocks):
-        """ . """
-        if len(blocks) == 0:
-            return
-
-        blocks = np.array(blocks)
-        iby = -1 if self.by == 'y' else 1
-        if len(blocks.shape) == 1:
-            s, e = blocks
-            self.blocks.extend(np.array([
-                [[s, e], [0, 0]][::iby]
-                ]))
-
-        elif len(blocks.shape) == 2:
-            self.blocks.extend(np.array([
-                [(s, e), (0, 0)][::iby] for s, e in blocks
-                ]))
-        else:
-            self.blocks = blocks
-
-        # TODO:  Find the width + offset to get bounds of it.
-        #  Precalculate min and max values for x and y for sorting.
-
-        xvals = np.array(self.blocks)[:,:,0].flatten()
-        yvals = np.array(self.blocks)[:,:,1].flatten()
-        self.xrange = xvals.min(), xvals.max()
-        self.yrange = yvals.min(), xvals.max()
         return
 
     def __call__(self):
@@ -97,40 +85,34 @@ class Feature(object):
 
     def draw(self):
         """ . """
-        block_patches = list()
-        between_patches = list()
+        for block_type, block_list in self.blocks.items():
+            collections = list()
+            block_shapes = self.shapes[block_type]
 
-        prev_block = None
-        for i, block in enumerate(self.blocks):
-            x, y = block
+            start = 0
+            end = None
 
-            #  Draw blocks (ie exons)
-            if i == 0 and self.first_shape is not None:
-                s = self.first_shape(x, y)
-            elif i == len(self.blocks) - 1 and self.last_shape is not None:
-                s = self.last_shape(x, y)
-            else:
-                s = self.shape(x, y)
-            block_patches.append(s.draw())
+            if len(block_shapes) == 3:
+                collections.append(
+                    PathCollection(block_shapes[0](*block_list[0]))
+                    )
+                start = 1
 
-            if prev_block is None or self.between_shape is None:
-                prev_block = block
-                continue
+            if len(block_shapes) in (2, 3):
+                end = -1
 
-            #  Draw between blocks (ie introns).
-            #  `-` just catches the bits that we aren't interested in.
-            (_, x1), (_, y1) = prev_block
-            (x2, _), (y2, _) = block
+            collections.append(
+                PathCollection(
+                    [block_shapes[start](*p) for p in block_list[start:end]]
+                    )
+                )
 
-            s = self.between_shape([x1, x2], [y1, y2])
-            between_patches.append(s.draw())
+            if len(block_shapes) in (2, 3):
+                collections.append(
+                    PathCollection(block_shapes[-1](*block_list[-1]))
+                    )
 
-            prev_block = block
-
-        #  Add between patches first to draw blocks on top.
-        patches = between_patches
-        patches.extend(block_patches)
-        return patches
+        return
 
 
 class FeatureTrack(object):

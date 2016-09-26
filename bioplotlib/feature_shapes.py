@@ -257,7 +257,6 @@ class OpenSemicircle(Shape):
 
         return Path(path, codes)
 
-
 '''
 
 class Hexagon(Shape):

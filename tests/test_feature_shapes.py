@@ -10,10 +10,11 @@ import numpy as np
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 
+
 class TestRectangle(unittest.TestCase):
 
     def test_simple(self):
-        obj = Rectangle(start=1, end=3, offset=1, width=1, by="x")
+        obj = Rectangle(start=1, end=3, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [1., 1.],
@@ -34,9 +35,8 @@ class TestRectangle(unittest.TestCase):
         self.assertEqual(obj.vertices.tolist(), expected_verts)
         self.assertEqual(obj.codes, expected_codes)
 
-    def test_by_y(self):
-        obj = Rectangle(offset=1, width=1, by="y")
-        path = obj.path(start=1, end=3)
+    def test_by_axis_y(self):
+        obj = Rectangle(start=1, end=3, offset=1, width=1, by_axis="y")
 
         expected_verts = [
             [1., 1.],
@@ -54,19 +54,18 @@ class TestRectangle(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_offset(self):
-        obj = Rectangle(offset=0.5, width=1, by="x")
-        path = obj.path(start=1, end=2, offset=0.5)
+        obj = Rectangle(start=1, end=2, offset=1, width=1, by_axis="x")
 
         expected_verts = [
-            [1, 1],
-            [1, 2],
-            [2, 2],
-            [2, 1],
-            [1, 1]
+            [1., 1.],
+            [1., 2.],
+            [2., 2.],
+            [2., 1.],
+            [1., 1.]
             ]
 
         expected_codes = [
@@ -77,21 +76,19 @@ class TestRectangle(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
-    def test_patch(self):
-        obj = Rectangle(offset=0.5, width=1, by="y")
-        patch = obj.patch(start=1, end=2, offset=0.5)
+    def test_path(self):
+        obj = Rectangle(start=1, end=2, offset=1, width=1, by_axis="y")
 
-        self.assertIsInstance(patch, PathPatch)
+        self.assertIsInstance(obj.path, Path)
 
 
 class TestTriangle(unittest.TestCase):
 
     def test_simple(self):
-        obj = Triangle(offset=1, width=1, by="x")
-        path = obj.path(start=1, end=3)
+        obj = Triangle(start=1, end=3, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [1., 1.],
@@ -107,12 +104,11 @@ class TestTriangle(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
-    def test_by_y(self):
-        obj = Triangle(offset=1, width=1, by="y")
-        path = obj.path(start=1, end=3)
+    def test_by_axis_y(self):
+        obj = Triangle(start=1, end=3, offset=1, width=1, by_axis="y")
 
         expected_verts = [
             [1., 1.],
@@ -128,18 +124,17 @@ class TestTriangle(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_offset(self):
-        obj = Triangle(offset=0.5, width=1, by="x")
-        path = obj.path(start=1, end=2, offset=0.5)
+        obj = Triangle(start=1, end=2, offset=1, width=1, by_axis="x")
 
         expected_verts = [
-            [1, 1],
-            [1, 2],
-            [2, 1.5],
-            [1, 1]
+            [1., 1.],
+            [1., 2.],
+            [2., 1.5],
+            [1., 1.]
             ]
 
         expected_codes = [
@@ -149,21 +144,19 @@ class TestTriangle(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
-    def test_patch(self):
-        obj = Triangle(offset=0.5, width=1, by="y")
-        patch = obj.patch(start=1, end=2, offset=0.5)
+    def test_path(self):
+        obj = Triangle(start=1, end=2, offset=1, width=1, by_axis="y")
 
-        self.assertIsInstance(patch, PathPatch)
+        self.assertIsInstance(obj.path, Path)
 
 
 class TestArrow(unittest.TestCase):
 
     def test_simple(self):
-        obj = Arrow(offset=1, width=1, by="x")
-        path = obj.path(start=1, end=3)
+        obj = Arrow(start=1, end=3, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [1., 1.],
@@ -187,12 +180,11 @@ class TestArrow(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
-    def test_by_y(self):
-        obj = Arrow(offset=1, width=1, by="y")
-        path = obj.path(start=1, end=3)
+    def test_by_axis_y(self):
+        obj = Arrow(start=1, end=3, offset=1, width=1, by_axis="y")
 
         expected_verts = [
             [1., 1.],
@@ -216,12 +208,11 @@ class TestArrow(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_offset(self):
-        obj = Arrow(offset=0.5, width=1, by="x")
-        path = obj.path(start=0, end=2, offset=0.5)
+        obj = Arrow(start=0, end=2, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [0., 1.],
@@ -245,17 +236,17 @@ class TestArrow(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_tail_width(self):
-        obj = Arrow(offset=0,
+        obj = Arrow(start=0,
+                    end=2,
+                    offset=0,
                     width=1,
                     tail_width=0.5,
                     head_length=1,
-                    by="x")
-
-        path = obj.path(start=0, end=2)
+                    by_axis="x")
 
         expected_verts = [
             [0., 0.25],
@@ -279,17 +270,17 @@ class TestArrow(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_head_length(self):
-        obj = Arrow(offset=0,
+        obj = Arrow(start=0,
+                    end=2,
+                    offset=0,
                     width=1,
                     tail_width=0.5,
                     head_length=1.5,
-                    by="x")
-
-        path = obj.path(start=0, end=2)
+                    by_axis="x")
 
         expected_verts = [
             [0., 0.25],
@@ -313,21 +304,19 @@ class TestArrow(unittest.TestCase):
             Path.CLOSEPOLY
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_patch(self):
-        obj = Arrow(offset=0.5, width=1, by="y")
-        patch = obj.patch(start=1, end=2, offset=0.5)
+        obj = Arrow(start=1, end=2, offset=1, width=1, by_axis="y")
 
-        self.assertIsInstance(patch, PathPatch)
+        self.assertIsInstance(obj.path, Path)
 
 
 class TestOpenTriangle(unittest.TestCase):
 
     def test_simple(self):
-        obj = OpenTriangle(offset=1, width=1, by="x")
-        path = obj.path(start=1, end=3)
+        obj = OpenTriangle(start=1, end=3, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [1., 1.],
@@ -341,12 +330,11 @@ class TestOpenTriangle(unittest.TestCase):
             Path.LINETO,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
-    def test_by_y(self):
-        obj = OpenTriangle(offset=1, width=1, by="y")
-        path = obj.path(start=1, end=3)
+    def test_by_axis_y(self):
+        obj = OpenTriangle(start=1, end=3, offset=1, width=1, by_axis="y")
 
         expected_verts = [
             [1., 1.],
@@ -360,12 +348,11 @@ class TestOpenTriangle(unittest.TestCase):
             Path.LINETO,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_offset(self):
-        obj = OpenTriangle(offset=0.5, width=1, by="x")
-        path = obj.path(start=0, end=2, offset=0.5)
+        obj = OpenTriangle(start=0, end=2, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [0., 1.],
@@ -379,22 +366,19 @@ class TestOpenTriangle(unittest.TestCase):
             Path.LINETO,
             ]
 
-
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_patch(self):
-        obj = OpenTriangle(offset=0.5, width=1, by="y")
-        patch = obj.patch(start=1, end=2, offset=0.5)
+        obj = OpenTriangle(start=1, end=2, offset=1, width=1, by_axis="y")
 
-        self.assertIsInstance(patch, PathPatch)
+        self.assertIsInstance(obj.path, Path)
 
 
 class TestOpenRectangle(unittest.TestCase):
 
     def test_simple(self):
-        obj = OpenRectangle(offset=1, width=1, by="x")
-        path = obj.path(start=1, end=3)
+        obj = OpenRectangle(start=1, end=3, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [1., 1.],
@@ -410,12 +394,11 @@ class TestOpenRectangle(unittest.TestCase):
             Path.LINETO,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
-    def test_by_y(self):
-        obj = OpenRectangle(offset=1, width=1, by="y")
-        path = obj.path(start=1, end=3)
+    def test_by_axis_y(self):
+        obj = OpenRectangle(start=1, end=3, offset=1, width=1, by_axis="y")
 
         expected_verts = [
             [1., 1.],
@@ -431,12 +414,11 @@ class TestOpenRectangle(unittest.TestCase):
             Path.LINETO,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_offset(self):
-        obj = OpenRectangle(offset=0.5, width=1, by="x")
-        path = obj.path(start=0, end=2, offset=0.5)
+        obj = OpenRectangle(start=0, end=2, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [0., 1.],
@@ -452,21 +434,19 @@ class TestOpenRectangle(unittest.TestCase):
             Path.LINETO,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_patch(self):
-        obj = OpenRectangle(offset=0.5, width=1, by="y")
-        patch = obj.patch(start=1, end=2, offset=0.5)
+        obj = OpenRectangle(start=1, end=2, offset=1, width=1, by_axis="y")
 
-        self.assertIsInstance(patch, PathPatch)
+        self.assertIsInstance(obj.path, Path)
 
 
 class TestOpenSemicircle(unittest.TestCase):
 
     def test_simple(self):
-        obj = OpenSemicircle(offset=1, width=1, by="x")
-        path = obj.path(start=1, end=3)
+        obj = OpenSemicircle(start=1, end=3, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [1., 1.],
@@ -479,15 +459,14 @@ class TestOpenSemicircle(unittest.TestCase):
             Path.MOVETO,
             Path.CURVE4,
             Path.CURVE4,
-            Path.LINETO,
+            Path.CURVE4,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
-    def test_by_y(self):
-        obj = OpenSemicircle(offset=1, width=1, by="y")
-        path = obj.path(start=1, end=3)
+    def test_by_axis_y(self):
+        obj = OpenSemicircle(start=1, end=3, offset=1, width=1, by_axis="y")
 
         expected_verts = [
             [1., 1.],
@@ -500,15 +479,14 @@ class TestOpenSemicircle(unittest.TestCase):
             Path.MOVETO,
             Path.CURVE4,
             Path.CURVE4,
-            Path.LINETO,
+            Path.CURVE4,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_offset(self):
-        obj = OpenSemicircle(offset=0.5, width=1, by="x")
-        path = obj.path(start=0, end=2, offset=0.5)
+        obj = OpenSemicircle(start=0, end=2, offset=1, width=1, by_axis="x")
 
         expected_verts = [
             [0., 1.],
@@ -521,17 +499,16 @@ class TestOpenSemicircle(unittest.TestCase):
             Path.MOVETO,
             Path.CURVE4,
             Path.CURVE4,
-            Path.LINETO,
+            Path.CURVE4,
             ]
 
-        self.assertEqual(path.vertices.tolist(), expected_verts)
-        self.assertEqual(path.codes.tolist(), expected_codes)
+        self.assertEqual(obj.vertices.tolist(), expected_verts)
+        self.assertEqual(obj.codes, expected_codes)
 
     def test_patch(self):
-        obj = OpenSemicircle(offset=0.5, width=1, by="y")
-        patch = obj.patch(start=1, end=2, offset=0.5)
+        obj = OpenSemicircle(start=1, end=2, offset=1, width=1, by_axis="y")
 
-        self.assertIsInstance(patch, PathPatch)
+        self.assertIsInstance(obj.path, Path)
 
 
 if __name__ == '__main__':

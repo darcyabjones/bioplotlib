@@ -19,7 +19,7 @@ from matplotlib.path import Path
 
 ################################## Classes ###################################
 
-class Shape(matplotlib.path.Path):
+class Shape(matplotlib.patches.Patch):
 
     """ Base class for drawing genomic features.
 
@@ -31,21 +31,22 @@ class Shape(matplotlib.path.Path):
             start,
             end,
             strand=None,
-            offset=0,
             width=1,
-            by=None,
+            offset=0,
+            by_axis=None,
+            name=None,
             **kwargs
             ):
         """ . """
+        super().__init__(**kwargs)
         self._start = start
         self._end = end
         self._strand = strand
         self._offset = offset
         self._width = width
-        self._by = by
-        self._draw_vertices()
-        self._codes = None
-        super().__init__(self._vertices, **kwargs)
+        self._by_axis = by_axis
+        self.name = name
+        self._draw_path()
         return
 
     def __repr__(self):
@@ -54,7 +55,46 @@ class Shape(matplotlib.path.Path):
                       "end={_end}, "
                       "offset={_offset}, "
                       "width={_width}, "
-                      "by={_by})").format(obj=clss, **self.__dict__)
+                      "by_axis={_by_axis})").format(obj=clss, **self.__dict__)
+
+    def _draw_vertices(self):
+        raise NotImplementedError
+        return
+
+    def _draw_path(self):
+        self._draw_vertices()
+        try:
+            self._path.vertices = self._vertices
+        except AttributeError:
+            self._path = Path(self._vertices, self._codes)
+
+    @property
+    def path(self):
+        return self._path
+
+    def get_path(self):
+        # Alias to path
+        return self.path
+
+    @property
+    def vertices(self):
+        return self._vertices
+
+    @vertices.setter
+    def vertices(self, vertices):
+        self._vertices = vertices
+        self._draw_path()
+        return
+
+    @property
+    def codes(self):
+        return self._codes
+
+    @codes.setter
+    def codes(self, codes):
+        self._codes = codes
+        self._draw_path()
+        return
 
     @property
     def start(self):
@@ -63,7 +103,7 @@ class Shape(matplotlib.path.Path):
     @start.setter
     def start(self, start):
         self._start = start
-        self._draw_vertices()
+        self._draw_path()
         return
 
     @property
@@ -73,7 +113,7 @@ class Shape(matplotlib.path.Path):
     @end.setter
     def end(self, end):
         self._end = end
-        self._draw_vertices()
+        self._draw_path()
         return
 
     @property
@@ -82,15 +122,8 @@ class Shape(matplotlib.path.Path):
 
     @strand.setter
     def strand(self, strand):
-        if strand in (True, 0, "+", "forward"):
-            strand = "+"
-        elif strand in (False, 1, "-", "reverse"):
-            strand = "-"
-        else:
-            strand = None
-
         self._strand = strand
-        self._draw_vertices()
+        self._draw_path()
         return
 
     @property
@@ -100,7 +133,7 @@ class Shape(matplotlib.path.Path):
     @offset.setter
     def offset(self, offset):
         self._offset = offset
-        self._draw_vertices()
+        self._draw_path()
         return
 
     @property
@@ -110,24 +143,35 @@ class Shape(matplotlib.path.Path):
     @width.setter
     def width(self, width):
         self._width = width
-        self._draw_vertices()
+        self._draw_path()
         return
 
     @property
-    def by(self):
-        return self._by
+    def by_axis(self):
+        return self._by_axis
 
-    @end.setter
-    def by(self, by):
-        self._by = by
-        self._draw_vertices()
+    @by_axis.setter
+    def by_axis(self, by_axis):
+        self._by_axis = by_axis
+        self._draw_path()
 
 
 class Rectangle(Shape):
 
     """ Rectangle. """
 
-    def _draw_codes(self):
+    def __init__(
+            self,
+            start,
+            end,
+            strand=None,
+            width=1,
+            offset=0,
+            by_axis=None,
+            name=None,
+            **kwargs
+            ):
+
         self._codes = [
             Path.MOVETO,
             Path.LINETO,
@@ -135,6 +179,17 @@ class Rectangle(Shape):
             Path.LINETO,
             Path.CLOSEPOLY
             ]
+
+        super().__init__(
+            start=start,
+            end=end,
+            strand=strand,
+            offset=offset,
+            width=width,
+            by_axis=by_axis,
+            name=name,
+            **kwargs
+            )
         return
 
     def _draw_vertices(self):
@@ -153,24 +208,44 @@ class Rectangle(Shape):
             [start, offset]  # bottom left
             ])
 
-        if self.by == "y":
-            self._vertices = path[:,::-1]
+        if self.by_axis == "y":
+            self._vertices = self._vertices[:,::-1]
 
-        self._update_values()
         return
 
 
 class Triangle(Shape):
 
     """ Triangle. """
+    def __init__(
+            self,
+            start,
+            end,
+            strand=None,
+            width=1,
+            offset=0,
+            by_axis=None,
+            name=None,
+            **kwargs
+            ):
 
-    def _draw_codes(self):
         self._codes = [
             Path.MOVETO,
             Path.LINETO,
             Path.LINETO,
             Path.CLOSEPOLY
             ]
+
+        super().__init__(
+            start=start,
+            end=end,
+            strand=strand,
+            offset=offset,
+            width=width,
+            by_axis=by_axis,
+            name=name,
+            **kwargs
+            )
         return
 
     def _draw_vertices(self):
@@ -182,11 +257,7 @@ class Triangle(Shape):
         offset = self.offset
         strand = self.strand
 
-        if strand is None:
-            if start > end:
-                strand = "-"
-
-        if strand == "-":
+        if strand == -1:
             start = self.end
             end = self.start
 
@@ -197,10 +268,8 @@ class Triangle(Shape):
             [start, offset]
             ])
 
-        if self.by == "y":
-            self._vertices = path[:,::-1]
-
-        self._update_values()
+        if self.by_axis == "y":
+            self._vertices = self._vertices[:,::-1]
         return
 
 
@@ -213,39 +282,15 @@ class Arrow(Shape):
             start,
             end,
             strand=None,
-            offset=0,
-            width=1,
-            by=None,
             head_length=1,
             tail_width=None,
+            width=1,
+            offset=0,
+            by_axis=None,
+            name=None,
             **kwargs
             ):
         """ . """
-        self._tail_width = tail_width
-        self._head_length = head_length
-
-        super().__init__(start, end, strand, offset, width, by, **kwargs)
-        return
-
-    @property
-    def head_length(self):
-        return self._head_length
-
-    @head_length.setter
-    def by(self, head_length):
-        self._head_length = head_length
-        self._draw_vertices()
-
-    @property
-    def tail_width(self):
-        return self._tail_width
-
-    @tail_width.setter
-    def by(self, tail_width):
-        self._tail_width = tail_width
-        self._draw_vertices()
-
-    def _draw_codes(self):
         self._codes = [
             Path.MOVETO,
             Path.LINETO,
@@ -256,7 +301,39 @@ class Arrow(Shape):
             Path.LINETO,
             Path.CLOSEPOLY
             ]
+
+        self._tail_width = tail_width
+        self._head_length = head_length
+
+        super().__init__(
+            start=start,
+            end=end,
+            strand=strand,
+            offset=offset,
+            width=width,
+            by_axis=by_axis,
+            name=name,
+            **kwargs
+            )
         return
+
+    @property
+    def head_length(self):
+        return self._head_length
+
+    @head_length.setter
+    def head_length(self, head_length):
+        self._head_length = head_length
+        self._draw_vertices()
+
+    @property
+    def tail_width(self):
+        return self._tail_width
+
+    @tail_width.setter
+    def tail_width(self, tail_width):
+        self._tail_width = tail_width
+        self._draw_vertices()
 
     def _draw_vertices(self):
         """ . """
@@ -266,137 +343,203 @@ class Arrow(Shape):
         strand = self.strand
         width = self.width
         offset = self.offset
+
         head_length = self.head_length
         tail_width = self.tail_width
 
-        length = abs(end - start)
-        print("length", length)
-
         if tail_width is None:
             tail_width = self.width
-        print("tw", tail_width)
 
-        if abs(head_length) > abs(length):
-            print("abs Head length")
-            head_length = length
-        print("hl", head_length)
+        if abs(head_length) > abs(end - start):
+            head_length = end - start
 
-        if strand is None and start > end:
-            length *= -1
+        if start > end:
             head_length *= -1
 
-        if strand == "-":
+        if strand == -1:
             start = self.end
-            length *= -1
+            end = self.start
             head_length *= -1
 
         tail_offset = offset + (width - tail_width) / 2
 
-        print("start", start)
-        print("length", length)
-        print("hl", head_length)
-
-
         self._vertices = np.array([
             [start, tail_offset],
             [start, tail_offset + tail_width],
-            [start + length - head_length, tail_offset + tail_width],
-            [start + length - head_length, offset + width],
-            [start + length, offset + (width / 2)],
-            [start + length - head_length, offset],
-            [start + length - head_length, tail_offset],
+            [end - head_length, tail_offset + tail_width],
+            [end - head_length, offset + width],
+            [end, offset + (width / 2)],
+            [end - head_length, offset],
+            [end - head_length, tail_offset],
             [start, tail_offset]
             ])
 
-        if self.by == "y":
-            self._vertices = path[:,::-1]
+        if self.by_axis == "y":
+            self._vertices = self._vertices[:,::-1]
 
-        self._update_values()
         return
 
 
 class OpenTriangle(Shape):
 
     """ . """
+    def __init__(
+            self,
+            start,
+            end,
+            strand=None,
+            width=1,
+            offset=0,
+            by_axis=None,
+            name=None,
+            **kwargs
+            ):
 
-    def path(self, start, end, offset=0, *args, **kwargs):
-        """ . """
-
-        offset += self.offset
-
-        codes = np.array([
+        self._codes = [
             Path.MOVETO,
             Path.LINETO,
-            Path.LINETO,
-            ])
+            Path.LINETO
+            ]
 
-        path = np.array([
+        super().__init__(
+            start=start,
+            end=end,
+            strand=strand,
+            offset=offset,
+            width=width,
+            by_axis=by_axis,
+            name=name,
+            **kwargs
+            )
+        return
+
+    def _draw_vertices(self):
+        """ . """
+
+        start = self.start
+        end = self.end
+        offset = self.offset
+        width = self.width
+
+        self._vertices = np.array([
             [start, offset],
-            [(start + end) / 2, offset + self.width],
+            [(start + end) / 2, offset + width],
             [end, offset],
             ])
 
-        if self.by == "y":
-            path = path[:,::-1]
+        if self.by_axis == "y":
+            self._vertices = self._vertices[:,::-1]
 
-        return Path(path, codes)
+        return
 
 
 class OpenRectangle(Shape):
 
     """ . """
+    def __init__(
+            self,
+            start,
+            end,
+            strand=None,
+            width=1,
+            offset=0,
+            by_axis=None,
+            name=None,
+            **kwargs
+            ):
 
-    def path(self, start, end, offset=0, *args, **kwargs):
-        """ . """
-
-        offset += self.offset
-
-        codes = np.array([
+        self._codes = [
             Path.MOVETO,
             Path.LINETO,
             Path.LINETO,
             Path.LINETO
-            ])
+            ]
 
-        path = np.array([
+        super().__init__(
+            start=start,
+            end=end,
+            strand=strand,
+            offset=offset,
+            width=width,
+            by_axis=by_axis,
+            name=name,
+            **kwargs
+            )
+        return
+
+    def _draw_vertices(self):
+        """ . """
+
+        start = self.start
+        end = self.end
+        offset = self.offset
+        width = self.width
+
+        self._vertices = np.array([
             [start, offset],  # bottom left
-            [start, offset + self.width],  # top left
-            [end, offset + self.width],  # top right
+            [start, offset + width],  # top left
+            [end, offset + width],  # top right
             [end, offset],  # bottom right
             ])
 
-        if self.by == "y":
-            path = path[:,::-1]
+        if self.by_axis == "y":
+            self._vertices = self._vertices[:,::-1]
 
-        return Path(path, codes)
+        return
 
 class OpenSemicircle(Shape):
 
     """ . """
+    def __init__(
+            self,
+            start,
+            end,
+            strand=None,
+            width=1,
+            offset=0,
+            by_axis=None,
+            name=None,
+            **kwargs
+            ):
 
-    def path(self, start, end, offset=0, *args, **kwargs):
-        """ . """
-
-        offset += self.offset
-
-        codes = np.array([
+        self._codes = [
             Path.MOVETO,
             Path.CURVE4,
             Path.CURVE4,
-            Path.LINETO,
-            ])
+            Path.CURVE4,
+            ]
 
-        path = np.array([
+        super().__init__(
+            start=start,
+            end=end,
+            strand=strand,
+            offset=offset,
+            width=width,
+            by_axis=by_axis,
+            name=name,
+            **kwargs
+            )
+        return
+
+
+    def _draw_vertices(self):
+        """ . """
+        start = self.start
+        end = self.end
+        offset = self.offset
+        width = self.width
+
+        self._vertices = np.array([
             [start, offset],  # bottom left
-            [start, offset + self.width],  # top left
-            [end, offset + self.width],  # top right
+            [start, offset + width],  # top left
+            [end, offset + width],  # top right
             [end, offset],  # bottom right
             ])
 
-        if self.by == "y":
-            path = path[:,::-1]
+        if self.by_axis == "y":
+            self._vertices = self._vertices[:,::-1]
 
-        return Path(path, codes)
+        return
 
 '''
 

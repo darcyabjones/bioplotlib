@@ -1,3 +1,12 @@
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+
+from builtins import (
+    bytes, dict, int, list, object, range, str,
+    ascii, chr, hex, input, next, oct, open,
+    pow, round, super, filter, map, zip
+    )
+
 """ Shapes for drawing genes and gene features. """
 
 __contributors = [
@@ -6,6 +15,7 @@ __contributors = [
 
 
 ############################ Import all modules ##############################
+
 
 from math import sin
 from math import radians
@@ -236,7 +246,7 @@ class Triangle(Shape):
             Path.CLOSEPOLY
             ]
 
-        super().__init__(
+        super(self).__init__(
             start=start,
             end=end,
             strand=strand,

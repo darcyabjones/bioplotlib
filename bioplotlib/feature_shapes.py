@@ -246,7 +246,7 @@ class Triangle(Shape):
             Path.CLOSEPOLY
             ]
 
-        super(self).__init__(
+        super().__init__(
             start=start,
             end=end,
             strand=strand,

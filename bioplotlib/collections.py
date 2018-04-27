@@ -26,9 +26,9 @@ from matplotlib.patches import Patch
 
 from matplotlib.collections import Collection
 
-import feature_shapes
-from feature_shapes import Triangle
-from feature_shapes import OpenTriangle
+import bioplotlib.feature_shapes
+from bioplotlib.feature_shapes import Triangle
+from bioplotlib.feature_shapes import OpenTriangle
 
 
 __contributors = [

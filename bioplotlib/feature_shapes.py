@@ -1,15 +1,10 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
-from builtins import (
-    bytes, dict, int, list, object, range, str,
-    ascii, chr, hex, input, next, oct, open,
-    pow, round, super, filter, map, zip
-    )
+""" Shapes for drawing genes and gene features.
+"""
 
-""" Shapes for drawing genes and gene features. """
-
-__contributors = [
+_contributors = [
     "Darcy Jones <darcy.ab.jones@gmail.com>"
     ]
 
@@ -34,6 +29,10 @@ class Shape(matplotlib.patches.Patch):
     """ Base class for drawing genomic features.
 
     Shape objects are templates for later drawing.
+
+    Methods
+    -------
+
     """
 
     def __init__(
@@ -227,6 +226,7 @@ class Rectangle(Shape):
 class Triangle(Shape):
 
     """ Triangle. """
+
     def __init__(
             self,
             start,
